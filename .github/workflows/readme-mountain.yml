@@ -1,0 +1,33 @@
+on:
+  schedule: # run 0:00 (JST)
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+jobs:
+  readme_mountain:
+    runs-on: ubuntu-latest
+    name: generate-mountain
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use README.Mountain
+        uses: suba327777/README.Mountain@release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.repository_owner }}
+          # select theme
+          THEME: "onedark"
+      - name: Diff
+        id: diff
+        run: |
+          git add -N .
+          git diff --name-only --exit-code
+        continue-on-error: true
+      - name: commit & push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "[μRM] generate svg."
+          git push
+        if: steps.diff.outcome == 'failure'
