@@ -1,2 +1,2 @@
 # mountain-output
-Climing mountain
+Climbing mountain
